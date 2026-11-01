@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تحدي أبطال الحاسب</title>
+<style>
+:root{font-family:Tahoma,Arial,sans-serif;color:#1c3150}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(135deg,#dff6ff,#eef0ff 60%,#ffe6ee);display:grid;place-items:center;padding:20px}.card{background:#fff;max-width:620px;width:100%;border-radius:26px;padding:30px;box-shadow:0 18px 50px #334b7020;text-align:center}.emoji{font-size:54px}h1{margin:6px 0;color:#2450a4;font-size:30px}p{line-height:1.8}.meta{display:flex;justify-content:space-between;font-weight:bold;margin:24px 0 10px}.bar{height:12px;background:#e9eff7;border-radius:30px;overflow:hidden}.fill{background:#5488ff;height:100%;width:0;transition:width .3s}h2{font-size:23px;line-height:1.7;margin:28px 0}.choices{display:grid;gap:12px}.choice{border:2px solid #e1e9f5;background:#f7faff;border-radius:14px;padding:17px;font-size:19px;cursor:pointer;font-weight:bold;color:#203f69;transition:.15s}.choice:hover:not(:disabled){border-color:#648dff;background:#edf3ff}.choice.correct{background:#dcfce8;border-color:#22a06b;color:#14663d}.choice.wrong{background:#ffe3e3;border-color:#e06464;color:#992b2b}.choice:disabled{cursor:default}.feedback{min-height:40px;font-weight:bold;font-size:18px;margin-top:17px}.primary{border:none;background:#365de7;color:white;border-radius:14px;padding:16px 28px;font-size:19px;font-weight:bold;cursor:pointer;margin-top:12px}.primary:hover{background:#2448c6}.primary:disabled{opacity:.4;cursor:default}.hidden{display:none}.footer{font-size:13px;color:#6f7f98;margin-top:26px}@media(max-width:480px){.card{padding:22px 16px}h1{font-size:25px}h2{font-size:20px}.choice{font-size:17px}}
+</style>
+</head>
+<body><main class="card">
+<div class="emoji">🖥️🎮</div><h1>تحدي أبطال الحاسب</h1>
+<section id="start"><p>هل أنت بطل الحاسب؟ أجب عن 10 أسئلة واجمع أكبر عدد من النقاط! ⭐</p><button class="primary" onclick="startGame()">ابدأ اللعب 🚀</button></section>
+<section id="game" class="hidden" aria-live="polite"><div class="meta"><span id="counter"></span><span id="score"></span></div><div class="bar"><div class="fill" id="progress"></div></div><h2 id="question"></h2><div id="choices" class="choices"></div><div id="feedback" class="feedback" role="status"></div><button id="next" class="primary hidden" onclick="nextQuestion()">السؤال التالي ←</button></section>
+<section id="end" class="hidden" aria-live="polite"><h2 id="result"></h2><p id="message"></p><button class="primary" onclick="startGame()">العب مرة أخرى 🔁</button></section>
+<div class="footer">لعبة تعليمية مجانية | HTML + CSS + JavaScript</div>
+</main>
+<script>
+const questions=[
+{q:'ما الجهاز الذي نستخدمه لكتابة الحروف والأرقام؟',a:['الفأرة','لوحة المفاتيح','الشاشة'],correct:1},
+{q:'ما الجهاز الذي يعرض الصور والنصوص؟',a:['الشاشة','الطابعة','السماعة'],correct:0},
+{q:'أي جهاز نستخدمه لتحريك مؤشر الشاشة؟',a:['الماسح الضوئي','الطابعة','الفأرة'],correct:2},
+{q:'ما وظيفة الطابعة؟',a:['إدخال الصوت','طباعة الأوراق','عرض الفيديو'],correct:1},
+{q:'ما الجهاز الذي نسمع منه الأصوات؟',a:['السماعات','لوحة المفاتيح','الشاشة'],correct:0},
+{q:'أي زر نستخدمه لترك مسافة بين الكلمات؟',a:['Enter','Backspace','Space'],correct:2},
+{q:'ما الزر الذي نستخدمه عادة للانتقال لسطر جديد؟',a:['Enter','Shift','Esc'],correct:0},
+{q:'ما الجهاز الذي يساعدنا على تسجيل الصوت؟',a:['الفأرة','الميكروفون','الشاشة'],correct:1},
+{q:'ما الاستخدام الصحيح للحاسب؟',a:['سكب الماء عليه','شد الأسلاك','التعلم والبحث'],correct:2},
+{q:'ما أفضل طريقة للعناية بالحاسب؟',a:['المحافظة على نظافته','الأكل فوق لوحة المفاتيح','إغلاق فتحات التهوية'],correct:0}
+];
+let index=0,points=0,answered=false;
+const el=id=>document.getElementById(id);
+function show(id){['start','game','end'].forEach(x=>el(x).classList.toggle('hidden',x!==id))}
+function startGame(){index=0;points=0;show('game');render()}
+function render(){answered=false;const q=questions[index];el('counter').textContent=`السؤال ${index+1} من ${questions.length}`;el('score').textContent=`النقاط: ${points}`;el('progress').style.width=`${index/questions.length*100}%`;el('question').textContent=q.q;el('feedback').textContent='';el('next').classList.add('hidden');el('choices').innerHTML='';q.a.forEach((answer,i)=>{const b=document.createElement('button');b.className='choice';b.textContent=answer;b.onclick=()=>choose(i);el('choices').appendChild(b)})}
+function choose(selected){if(answered)return;answered=true;const q=questions[index],correct=selected===q.correct; if(correct)points+=10;[...el('choices').children].forEach((b,i)=>{b.disabled=true;if(i===q.correct)b.classList.add('correct');else if(i===selected)b.classList.add('wrong')});el('feedback').textContent=correct?'🌟 أحسنت! إجابة صحيحة':'💡 حاول مرة أخرى في السؤال القادم!';el('score').textContent=`النقاط: ${points}`;el('next').textContent=index===questions.length-1?'شاهد نتيجتك 🏆':'السؤال التالي ←';el('next').classList.remove('hidden')}
+function nextQuestion(){if(!answered)return;index++;if(index<questions.length){render()}else{el('progress').style.width='100%';show('end');el('result').textContent=`🏆 نتيجتك: ${points} من ${questions.length*10}`;el('message').textContent=points===100?'ممتاز! أنت بطل الحاسب! 🌟':points>=70?'رائع! لديك معلومات قوية عن الحاسب 👏':'أحسنت المحاولة! العب مرة أخرى لتزيد نقاطك 💪'}}
+</script></body></html>
